@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Control LED</title>
+</head>
+<body>
+    <h1>Stare LED</h1>
+    <p id="status">Starea curentă a LED-ului: </p>
+
+    <h1>Temperatura curentă</h1>
+    <p id="temperature">Temperatura curentă: Așteptând date...</p> <!-- Textul de așteptare pentru temperatura curentă -->
+    <!--Buton de aprindere a ledului -->
+
+    <h2>Control LED</h2>
+    <button onclick="sendCommand('on')">Aprinde LED</button>
+    <button onclick="sendCommand('off')">Stinge LED</button>
+    <script>
+        //FUNCTIA DE APRINDERE A LEDULUI
+        function sendCommand(action) {
+            fetch('/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=' + action,
+            }).then(response => {
+                if (response.ok) {
+                    document.getElementById('status').innerText = 'Starea curentă a LED-ului: ' + (action === 'on' ? 'APRINS' : 'STINS');
+                }
+            });
+        }
+
+
+        //FUNCTIE DE PRELUARE A TEMPERATURII
+        function getTemperature() {
+            fetch('/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=get_temp_now', // Trimite comanda către Flask pentru a obține temperatura instantanee
+            }).then(response => {
+                if (response.ok) {
+                    return response.text();
+                }
+            }).then(data => {
+                document.getElementById('temperature').innerText = 'Temperatura curentă: ' + data; // Actualizează temperatura afișată pe pagină
+            });
+        }setInterval(getTemperature, 2000); // Actualizează temperatura la fiecare 5 secunde
+
+
+    </script>
+
+
+
+{#    <h1>Trimitere Email</h1>#}
+{#     <!--  Trimitere EMAIL  -->#}
+{#    <form action="/send_email" method="POST">#}
+{#        <label for="recipient">Destinatar:</label>#}
+{#        <input type="email" name="recipient" id="recipient" required>#}
+{#        <br>#}
+{#        <button type="submit">Trimite Email</button>#}
+{#    </form>#}
+
+
+</body>
+</html>
